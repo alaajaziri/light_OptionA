@@ -94,9 +94,10 @@ function addLowerMetalAccent(parent: THREE.Group) {
   );
   accent.castShadow = true;
   parent.add(accent);
+  return accent;
 }
 
-export function createMintHexObject() {
+export function createMintHexParts() {
   const object = new THREE.Group();
   object.name = "Mint glass hexagonal object";
 
@@ -152,21 +153,39 @@ export function createMintHexObject() {
     envMapIntensity: 0.9,
   });
 
-  addPart(object, hexExtrusion(2.08, 1.19, 0.13, 0.24), [bottomTop, bottomSide], 0.15);
-  addPart(object, hexExtrusion(2.2, 0.2, 0.035, 0.23), brushedMetal, 1.37);
-  addPart(object, hexExtrusion(2.08, 1.25, 0.12, 0.24), [glassTop, glassSide], 1.58);
-  addLowerMetalAccent(object);
+  const bottom = new THREE.Group();
+  addPart(bottom, hexExtrusion(2.08, 1.19, 0.13, 0.24), [bottomTop, bottomSide], 0.15);
+  object.add(bottom);
+
+  const metalRim = new THREE.Group();
+  addPart(metalRim, hexExtrusion(2.2, 0.2, 0.035, 0.23), brushedMetal, 1.37);
+  object.add(metalRim);
+
+  const glassBody = new THREE.Group();
+  const accentMesh = addLowerMetalAccent(glassBody);
+  addPart(glassBody, hexExtrusion(2.08, 1.25, 0.12, 0.24), [glassTop, glassSide], 1.58);
+  object.add(glassBody);
 
   const socket = new THREE.MeshStandardMaterial({
     color: "#718f78",
     metalness: 0.1,
     roughness: 0.36,
   });
-  addPart(object, hexExtrusion(1.24, 0.013, 0.006, 0.115, 1.11), socket, 2.952);
-  addPart(object, hexExtrusion(1.15, 0.13, 0.025, 0.105, 0.835), [brightMetal, insideMetal], 2.965);
-  addPart(object, hexExtrusion(0.837, 0.012, 0.003, 0.075), insideMetal, 2.959);
+  const socketGroup = new THREE.Group();
+  addPart(socketGroup, hexExtrusion(1.24, 0.013, 0.006, 0.115, 1.11), socket, 2.952);
+  object.add(socketGroup);
+
+  const innerRing = new THREE.Group();
+  addPart(innerRing, hexExtrusion(1.15, 0.13, 0.025, 0.105, 0.835), [brightMetal, insideMetal], 2.965);
+  object.add(innerRing);
+
+  const innerCap = new THREE.Group();
+  addPart(innerCap, hexExtrusion(0.837, 0.012, 0.003, 0.075), insideMetal, 2.959);
+  object.add(innerCap);
+
+  const topCap = new THREE.Group();
   addPart(
-    object,
+    topCap,
     hexExtrusion(0.785, 0.006, 0.002, 0.07),
     new THREE.MeshStandardMaterial({
       color: "#b0b8ad",
@@ -176,8 +195,17 @@ export function createMintHexObject() {
     }),
     2.976,
   );
+  object.add(topCap);
 
-  return object;
+  return {
+    object,
+    parts: { bottom, metalRim, glassBody, socket: socketGroup, innerRing, innerCap, topCap },
+    accentMesh,
+  };
+}
+
+export function createMintHexObject() {
+  return createMintHexParts().object;
 }
 
 export function disposeMintHexObject(object: THREE.Group) {

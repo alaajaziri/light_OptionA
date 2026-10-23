@@ -150,7 +150,7 @@ function HeroSlide({ onNext, isActive }: { onNext: () => void; isActive: boolean
   return (
     <>
       <div className="hero-art" aria-hidden="true">
-        {isActive && <MintHexScene className="hero-model" rotating resetKey={0} />}
+        <MintHexScene className="hero-model" rotating={isActive} resetKey={0} />
       </div>
       <div className="hero-shade" aria-hidden="true" />
       <div className="slide-inner hero-inner">
@@ -568,18 +568,13 @@ const takeaways = [
   { number: "03", text: "Node.js powers APIs, scripts, and tools." },
 ];
 
-function SummarySlide({ onRestart }: { onRestart: () => void }) {
+function SummarySlide() {
   return (
     <div className="slide-inner summary-layout">
       <div className="summary-heading">
         <Eyebrow number="07">SUMMARY</Eyebrow>
         <h2 className="slide-title">Node.js,<br /><span>in three ideas.</span></h2>
         <p className="slide-lead">One language, from the browser to tools and the server.</p>
-        <button className="primary-button restart-button" onClick={onRestart}>
-          Review the presentation <ArrowRight size={19} strokeWidth={1.8} />
-        </button>
-      </div>
-      <div className="summary-right">
         <div className="takeaway-list">
           {takeaways.map((item, i) => (
             <div className="takeaway" key={item.number} style={stagger(i)}>
@@ -588,15 +583,16 @@ function SummarySlide({ onRestart }: { onRestart: () => void }) {
             </div>
           ))}
         </div>
-        <div className="source-links">
-          <span>LEARN MORE</span>
-          <a href="https://nodejs.org/en/about" target="_blank" rel="noopener noreferrer" style={stagger(0)}>
-            About Node.js <ArrowUpRight size={15} />
-          </a>
-          <a href="https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick" target="_blank" rel="noopener noreferrer" style={stagger(1)}>
-            The event loop <ArrowUpRight size={15} />
-          </a>
-        </div>
+      </div>
+      <div className="summary-right" aria-hidden="true">
+        <MintHexScene
+          className="summary-model"
+          rotating
+          resetKey={0}
+          modelScale={1.1 }
+          modelOffsetX={-0.2}
+          modelOffsetY={-0.2}
+        />
       </div>
     </div>
   );
@@ -708,7 +704,7 @@ export default function App() {
     <FeaturesSlide />,
     <RoleSlide />,
     <CodeSlide isActive={active === 5} />,
-    <SummarySlide onRestart={() => goTo(0)} />,
+    <SummarySlide />,
   ];
 
   return (
