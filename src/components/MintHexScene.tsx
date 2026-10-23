@@ -3,11 +3,13 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, Environment, Lightformer, OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
-import { createMintHexParts, disposeMintHexObject } from "../three/createMintHexObject";
+import { ASSEMBLY_MAX_DELAY, createMintHexObject, disposeMintHexObject } from "../three/createMintHexObject";
+import type { AssemblyInfo } from "../three/createMintHexObject";
 
 type MintHexSceneProps = {
   rotating: boolean;
   resetKey: number;
+  assembled?: boolean;
   className?: string;
   modelScale?: number;
   modelOffsetX?: number;
@@ -21,90 +23,82 @@ const defaultModelOffsetX = -2;
 const defaultModelOffsetY = -0.5;
 const modelRotationSpeed = 0.3;
 
-const disassemblyConfig = {
-  bottom: { offset: [-0.8, -0.6, -0.4], rotation: [0.2, 0.3, -0.15] },
-  metalRim: { offset: [0.6, 0.5, -0.3], rotation: [-0.15, -0.2, 0.1] },
-  glassBody: { offset: [-0.3, 0.8, 0.5], rotation: [0.1, 0.15, 0.2] },
-  socket: { offset: [0.5, -0.4, 0.3], rotation: [-0.1, 0.25, -0.1] },
-  innerRing: { offset: [-0.4, 0.3, 0.4], rotation: [0.2, -0.1, 0.15] },
-  innerCap: { offset: [0.3, 0.6, -0.2], rotation: [-0.2, 0.2, -0.2] },
-  topCap: { offset: [0, 1, 0], rotation: [0, 0.4, 0] },
-} as const;
+const ASSEMBLE_SPEED = 1.15;
+const DISASSEMBLE_SPEED = 2.1;
+
+const smootherstep = (value: number) => {
+  const x = THREE.MathUtils.clamp(value, 0, 1);
+  return x * x * (3 - 2 * x);
+};
 
 function FloatingObject({
   rotating,
-  disassembled,
+  assembled,
   modelScale,
   modelOffsetX,
   modelOffsetY,
 }: {
   rotating: boolean;
-  disassembled: boolean;
+  assembled: boolean;
   modelScale: number;
   modelOffsetX: number;
   modelOffsetY: number;
 }) {
-  const modelData = useMemo(() => createMintHexParts(), []);
+  const model = useMemo(() => createMintHexObject(), []);
   const group = useRef<THREE.Group>(null);
   const entered = useRef(false);
   const progress = useRef(0);
   const reducedMotion = useMemo(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches, []);
 
-  const originalPositions = useMemo(
-    () =>
-      Object.fromEntries(
-        Object.entries(modelData.parts).map(([key, part]) => [
-          key,
-          { position: part.position.clone(), rotation: part.rotation.clone() },
-        ]),
-      ),
-    [modelData],
-  );
-
-  useEffect(() => () => disposeMintHexObject(modelData.object), [modelData]);
+  useEffect(() => () => disposeMintHexObject(model), [model]);
 
   useFrame(({ clock }, delta) => {
     if (!group.current) return;
 
     const time = clock.getElapsedTime();
+    const step = Math.min(delta, 0.05);
 
     if (!entered.current) {
       group.current.scale.setScalar(modelScale * 0.94);
       entered.current = true;
     }
 
-    group.current.scale.setScalar(THREE.MathUtils.damp(group.current.scale.x, modelScale, 3.2, delta));
-    const targetProgress = disassembled && !reducedMotion ? 1 : 0;
-    progress.current = THREE.MathUtils.damp(progress.current, targetProgress, 2.5, delta);
-    group.current.position.y = modelOffsetY + (disassembled ? 0 : reducedMotion ? 0 : Math.sin(time * 0.8) * 0.025);
+    const target = assembled ? 1 : 0;
+    if (reducedMotion) {
+      progress.current = target;
+    } else if (progress.current !== target) {
+      const speed = assembled ? ASSEMBLE_SPEED : DISASSEMBLE_SPEED;
+      progress.current = THREE.MathUtils.clamp(
+        progress.current + Math.sign(target - progress.current) * step * speed,
+        0,
+        1,
+      );
+    }
 
     if (rotating && !reducedMotion) {
-      group.current.rotation.y += delta * modelRotationSpeed;
-    } else if (!disassembled) {
+      group.current.rotation.y += step * modelRotationSpeed * (0.45 + 0.55 * progress.current);
+    } else {
       group.current.rotation.y = reducedMotion ? 0 : Math.sin(time * 0.38) * 0.025;
     }
 
-    Object.entries(modelData.parts).forEach(([key, part]) => {
-      const config = disassemblyConfig[key as keyof typeof disassemblyConfig];
-      const original = originalPositions[key];
-      if (!config || !original) return;
-
-      part.position.lerpVectors(
-        original.position,
-        original.position.clone().add(new THREE.Vector3(...config.offset)),
-        progress.current,
-      );
+    const span = 1 - ASSEMBLY_MAX_DELAY;
+    model.children.forEach((part) => {
+      const info = part.userData.assembly as AssemblyInfo | undefined;
+      if (!info) return;
+      const eased = smootherstep((progress.current - info.delay) / span);
+      const away = 1 - eased;
+      part.position.copy(info.base).addScaledVector(info.offset, away);
       part.rotation.set(
-        THREE.MathUtils.lerp(original.rotation.x, original.rotation.x + config.rotation[0], progress.current),
-        THREE.MathUtils.lerp(original.rotation.y, original.rotation.y + config.rotation[1], progress.current),
-        THREE.MathUtils.lerp(original.rotation.z, original.rotation.z + config.rotation[2], progress.current),
+        info.baseRotation.x + info.spin.x * away,
+        info.baseRotation.y + info.spin.y * away,
+        info.baseRotation.z + info.spin.z * away,
       );
     });
   });
 
   return (
     <group ref={group} position={[modelOffsetX, modelOffsetY, 0]}>
-      <primitive object={modelData.object} />
+      <primitive object={model} />
     </group>
   );
 }
@@ -186,10 +180,15 @@ function StudioEnvironment() {
   );
 }
 
-export default function MintHexScene({ rotating, resetKey, className }: MintHexSceneProps) {
-  const resolvedModelScale = arguments[0].modelScale ?? defaultModelScale;
-  const resolvedModelOffsetX = arguments[0].modelOffsetX ?? defaultModelOffsetX;
-  const resolvedModelOffsetY = arguments[0].modelOffsetY ?? defaultModelOffsetY;
+export default function MintHexScene({
+  rotating,
+  resetKey,
+  assembled = true,
+  className,
+  modelScale = defaultModelScale,
+  modelOffsetX = defaultModelOffsetX,
+  modelOffsetY = defaultModelOffsetY,
+}: MintHexSceneProps) {
 
   return (
     <div
@@ -212,10 +211,10 @@ export default function MintHexScene({ rotating, resetKey, className }: MintHexS
         <ContactShadows position={[0, -0.035, 0]} opacity={0.24} scale={7.5} blur={2.8} far={4} resolution={256} color="#737b70" frames={1} />
         <FloatingObject
           rotating={rotating}
-          disassembled={!rotating}
-          modelScale={resolvedModelScale}
-          modelOffsetX={resolvedModelOffsetX}
-          modelOffsetY={resolvedModelOffsetY}
+          assembled={assembled}
+          modelScale={modelScale}
+          modelOffsetX={modelOffsetX}
+          modelOffsetY={modelOffsetY}
         />
         <CameraAndControls resetKey={resetKey} />
       </Canvas>

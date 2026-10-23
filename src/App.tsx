@@ -147,10 +147,28 @@ function Eyebrow({ number, children }: { number: string; children: React.ReactNo
 }
 
 function HeroSlide({ onNext, isActive }: { onNext: () => void; isActive: boolean }) {
+  const [mounted, setMounted] = useState(isActive);
+
+  useEffect(() => {
+    if (isActive) {
+      setMounted(true);
+      return;
+    }
+    const id = window.setTimeout(() => setMounted(false), 900);
+    return () => window.clearTimeout(id);
+  }, [isActive]);
+
   return (
     <>
       <div className="hero-art" aria-hidden="true">
-        <MintHexScene className="hero-model" rotating={isActive} resetKey={0} />
+        {mounted && (
+          <MintHexScene
+            className="hero-model"
+            rotating={isActive}
+            assembled={isActive}
+            resetKey={0}
+          />
+        )}
       </div>
       <div className="hero-shade" aria-hidden="true" />
       <div className="slide-inner hero-inner">
@@ -568,7 +586,7 @@ const takeaways = [
   { number: "03", text: "Node.js powers APIs, scripts, and tools." },
 ];
 
-function SummarySlide() {
+function SummarySlide({ isActive }: { isActive: boolean }) {
   return (
     <div className="slide-inner summary-layout">
       <div className="summary-heading">
@@ -585,14 +603,17 @@ function SummarySlide() {
         </div>
       </div>
       <div className="summary-right" aria-hidden="true">
-        <MintHexScene
-          className="summary-model"
-          rotating
-          resetKey={0}
-          modelScale={1.1 }
-          modelOffsetX={-0.2}
-          modelOffsetY={-0.2}
-        />
+        {isActive && (
+          <MintHexScene
+            className="summary-model"
+            rotating
+            assembled
+            resetKey={0}
+            modelScale={1.1}
+            modelOffsetX={-0.2}
+            modelOffsetY={-0.2}
+          />
+        )}
       </div>
     </div>
   );
@@ -704,7 +725,7 @@ export default function App() {
     <FeaturesSlide />,
     <RoleSlide />,
     <CodeSlide isActive={active === 5} />,
-    <SummarySlide />,
+    <SummarySlide isActive={active === 6} />,
   ];
 
   return (

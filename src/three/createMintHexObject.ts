@@ -97,6 +97,46 @@ function addLowerMetalAccent(parent: THREE.Group) {
   return accent;
 }
 
+export const ASSEMBLY_MAX_DELAY = 0.4;
+
+export type AssemblyInfo = {
+  base: THREE.Vector3;
+  baseRotation: THREE.Euler;
+  offset: THREE.Vector3;
+  spin: THREE.Vector3;
+  delay: number;
+};
+
+function prepareAssembly(object: THREE.Group) {
+  const parts = object.children;
+  const count = Math.max(parts.length - 1, 1);
+
+  parts.forEach((part, index) => {
+    const t = index / count;
+    const angle = index * 2.3999632;
+    const radius = 0.5 + t * 1.45;
+    const lift = -1.7 + t * 4.8;
+
+    const info: AssemblyInfo = {
+      base: part.position.clone(),
+      baseRotation: part.rotation.clone(),
+      offset: new THREE.Vector3(
+        Math.cos(angle) * radius,
+        lift,
+        Math.sin(angle) * radius * 0.75,
+      ),
+      spin: new THREE.Vector3(
+        Math.sin(angle) * 0.34,
+        angle * 0.22,
+        Math.cos(angle) * 0.34,
+      ),
+      delay: t * ASSEMBLY_MAX_DELAY,
+    };
+
+    part.userData.assembly = info;
+  });
+}
+
 export function createMintHexParts() {
   const object = new THREE.Group();
   object.name = "Mint glass hexagonal object";
@@ -196,6 +236,7 @@ export function createMintHexParts() {
     2.976,
   );
   object.add(topCap);
+  prepareAssembly(object);
 
   return {
     object,
