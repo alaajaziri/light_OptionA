@@ -146,12 +146,10 @@ function Eyebrow({ number, children }: { number: string; children: React.ReactNo
   );
 }
 
-function HeroSlide({ onNext, isActive }: { onNext: () => void; isActive: boolean }) {
+function HeroSlide({ onNext }: { onNext: () => void }) {
   return (
     <>
-      <div className="hero-art" aria-hidden="true">
-        {isActive && <MintHexScene className="hero-model" rotating resetKey={0} />}
-      </div>
+      <div className="hero-art" aria-hidden="true" />
       <div className="hero-shade" aria-hidden="true" />
       <div className="slide-inner hero-inner">
         <div className="hero-copy">
@@ -702,7 +700,7 @@ export default function App() {
   }
 
   const slideContents = [
-    <HeroSlide onNext={() => goTo(1)} isActive={active === 0} />,
+    <HeroSlide onNext={() => goTo(1)} />,
     <DefinitionSlide />,
     <FunctioningSlide isActive={active === 2} />,
     <FeaturesSlide />,
@@ -710,6 +708,8 @@ export default function App() {
     <CodeSlide isActive={active === 5} />,
     <SummarySlide onRestart={() => goTo(0)} />,
   ];
+
+  const isIntro = active === 0;
 
   return (
     <main className="app-shell">
@@ -733,20 +733,28 @@ export default function App() {
         </div>
       </header>
 
-      <div className="presentation-stage" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-        {slides.map((slide, index) => (
-          <section
-            className={`slide slide-${index + 1}${active === index ? " is-active" : ""}`}
-            key={slide.number}
-            aria-label={`${slide.number} - ${slide.title}`}
-            aria-hidden={active !== index}
-            /* React 19 : booléen. React 18 : remplacer par
-               {...(active !== index ? { inert: "" } : {})} */
-            inert={active !== index || undefined}
-          >
-            {slideContents[index]}
-          </section>
-        ))}
+      <div className="stage-wrap" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+        <div className={`global-mint-stage${isIntro ? " is-assembled" : " is-exploded"}`} aria-hidden="true">
+          <MintHexScene exploded={!isIntro} interactive={isIntro} triggerKey={active} className="hero-model" resetKey={0} />
+          <div className={`stage-dust${isIntro ? "" : " visible"}`} aria-hidden="true">
+            <span /><span /><span /><span /><span /><span />
+          </div>
+        </div>
+        <div className="presentation-stage">
+          {slides.map((slide, index) => (
+            <section
+              className={`slide slide-${index + 1}${active === index ? " is-active" : ""}`}
+              key={slide.number}
+              aria-label={`${slide.number} - ${slide.title}`}
+              aria-hidden={active !== index}
+              /* React 19 : booléen. React 18 : remplacer par
+                 {...(active !== index ? { inert: "" } : {})} */
+              inert={active !== index || undefined}
+            >
+              {slideContents[index]}
+            </section>
+          ))}
+        </div>
       </div>
 
       <footer className="deck-footer">
