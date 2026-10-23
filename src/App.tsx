@@ -31,12 +31,12 @@ type SlideInfo = {
 
 const slides: SlideInfo[] = [
   { number: "01", label: "INTRODUCTION", title: "Node.js" },
-  { number: "02", label: "DÉFINITION", title: "Qu'est-ce que Node.js ?" },
-  { number: "03", label: "FONCTIONNEMENT", title: "La boucle d'événements" },
-  { number: "04", label: "FONCTIONNALITÉS", title: "Les principales forces" },
-  { number: "05", label: "DANS L'APPLICATION", title: "Son rôle dans le projet" },
-  { number: "06", label: "EN PRATIQUE", title: "Un serveur en quelques lignes" },
-  { number: "07", label: "SYNTHÈSE", title: "L'essentiel à retenir" },
+  { number: "02", label: "DEFINITION", title: "What is Node.js?" },
+  { number: "03", label: "HOW IT WORKS", title: "The event loop" },
+  { number: "04", label: "FEATURES", title: "The main strengths" },
+  { number: "05", label: "IN THE APPLICATION", title: "Its role in the project" },
+  { number: "06", label: "IN PRACTICE", title: "A server in a few lines" },
+  { number: "07", label: "SUMMARY", title: "The essentials to remember" },
 ];
 
 const serverCode = `import { createServer } from 'node:http';
@@ -45,7 +45,7 @@ createServer((_req, res) => {
   res.writeHead(200, {
     'Content-Type': 'application/json'
   });
-  const data = { message: 'Bonjour !' };
+  const data = { message: 'Hello!' };
   res.end(JSON.stringify(data));
 }).listen(3000);`;
 
@@ -155,17 +155,17 @@ function HeroSlide({ onNext, isActive }: { onNext: () => void; isActive: boolean
       <div className="hero-shade" aria-hidden="true" />
       <div className="slide-inner hero-inner">
         <div className="hero-copy">
-          <Eyebrow number="01">PRÉSENTATION EXPRESS</Eyebrow>
+          <Eyebrow number="01">QUICK INTRODUCTION</Eyebrow>
           <h1>
             Node<span className="hero-dot">.</span>js
           </h1>
-          <h2>Le JavaScript<br />côté serveur.</h2>
+          <h2>JavaScript<br />on the server.</h2>
           <p>
-            Une introduction simple à son fonctionnement, ses forces et sa place
-            dans une application web.
+            A simple introduction to how it works, its strengths, and its place
+            in a web application.
           </p>
           <button className="primary-button hero-cta" onClick={onNext}>
-            Commencer la présentation <ArrowRight size={19} strokeWidth={1.8} />
+            Start the presentation <ArrowRight size={19} strokeWidth={1.8} />
           </button>
         </div>
       </div>
@@ -174,34 +174,34 @@ function HeroSlide({ onNext, isActive }: { onNext: () => void; isActive: boolean
 }
 
 const runtimeLayers = [
-  { index: "01", title: "JavaScript", detail: "Le code que l'on écrit", core: false },
-  { index: "02", title: "Moteur V8", detail: "Compile et exécute le code", core: false },
-  { index: "03", title: "libuv", detail: "Boucle d'événements & E/S asynchrones", core: true },
-  { index: "04", title: "APIs Node.js", detail: "Réseau, fichiers, processus...", core: false },
+  { index: "01", title: "JavaScript", detail: "The code we write", core: false },
+  { index: "02", title: "V8 engine", detail: "Compiles and runs the code", core: false },
+  { index: "03", title: "libuv", detail: "Event loop & asynchronous I/O", core: true },
+  { index: "04", title: "Node.js APIs", detail: "Network, files, processes...", core: false },
 ];
 
 function DefinitionSlide() {
   return (
     <div className="slide-inner definition-layout">
       <div className="text-column">
-        <Eyebrow number="02">DÉFINITION</Eyebrow>
+        <Eyebrow number="02">DEFINITION</Eyebrow>
         <h2 className="slide-title">
-          Un environnement.<br /><span>Pas un langage.</span>
+          A runtime.<br /><span>Not a language.</span>
         </h2>
         <p className="slide-lead">
-          Node.js permet d'exécuter du JavaScript <strong>en dehors du navigateur</strong>,
-          notamment sur un serveur. Il assemble le moteur <strong>V8</strong> de Chrome
-          et la bibliothèque <strong>libuv</strong> pour donner accès au réseau,
-          aux fichiers et au système.
+          Node.js runs JavaScript <strong>outside the browser</strong>, especially
+          on a server. It combines Chrome's <strong>V8</strong> engine with the
+          <strong>libuv</strong> library to provide access to the network, files,
+          and the operating system.
         </p>
       </div>
 
-      <div className="runtime-visual" aria-label="Les quatre couches qui composent Node.js">
+      <div className="runtime-visual" aria-label="The four layers that make up Node.js">
         <svg className="runtime-outline" viewBox="0 0 290 290" fill="none" aria-hidden="true">
           <path d="M145 17 255.85 81v128L145 273 34.15 209V81L145 17Z" stroke="currentColor" />
           <path d="M145 53 224.67 99v92L145 237l-79.67-46V99L145 53Z" stroke="currentColor" />
         </svg>
-        <div className="visual-caption">ANATOMIE D'UN RUNTIME</div>
+        <div className="visual-caption">RUNTIME ANATOMY</div>
         <div className="runtime-rows">
           {runtimeLayers.map((layer, i) => (
             <div
@@ -214,21 +214,21 @@ function DefinitionSlide() {
                 <strong>{layer.title}</strong>
                 <small>{layer.detail}</small>
               </div>
-              {layer.core && <span className="runtime-badge">CŒUR ASYNC</span>}
+              {layer.core && <span className="runtime-badge">ASYNC CORE</span>}
             </div>
           ))}
         </div>
-        <p className="runtime-note"><span />Ni un nouveau langage, ni un framework.</p>
+        <p className="runtime-note"><span />Neither a new language nor a framework.</p>
       </div>
     </div>
   );
 }
 
 const flowSteps = [
-  { number: "01", icon: Inbox, title: "Une requête arrive", detail: "Le serveur reçoit une demande." },
-  { number: "02", icon: HardDrive, title: "L'E/S est déléguée", detail: "Fichier ou réseau est traité en arrière-plan par libuv." },
-  { number: "03", icon: Zap, title: "Node continue", detail: "Le thread principal reste libre pour d'autres tâches." },
-  { number: "04", icon: Send, title: "La réponse part", detail: "Le rappel (callback) s'exécute dès que le résultat est prêt." },
+  { number: "01", icon: Inbox, title: "A request arrives", detail: "The server receives a request." },
+  { number: "02", icon: HardDrive, title: "I/O is delegated", detail: "A file or network operation is handled in the background by libuv." },
+  { number: "03", icon: Zap, title: "Node continues", detail: "The main thread remains free for other tasks." },
+  { number: "04", icon: Send, title: "The response is sent", detail: "The callback runs as soon as the result is ready." },
 ];
 
 /* Boucle de 12 phases (~7,8 s) partagée entre les cartes et le schéma. */
@@ -243,17 +243,17 @@ function activeFlowStep(phase: number) {
 }
 
 function flowCaption(phase: number) {
-  if (phase === 0) return "Une requête arrive sur le serveur.";
-  if (phase <= 2) return "readFile() est délégué à libuv, en arrière-plan.";
-  if (phase <= 7) return "Le thread principal reste libre : il traite d'autres tâches.";
-  return "Le callback s'exécute : la réponse peut partir.";
+  if (phase === 0) return "A request arrives at the server.";
+  if (phase <= 2) return "readFile() is delegated to libuv in the background.";
+  if (phase <= 7) return "The main thread remains free to handle other tasks.";
+  return "The callback runs: the response can be sent.";
 }
 
 const laneBlocks = [
-  { at: 0, left: 1, label: "requête", kind: "" },
+  { at: 0, left: 1, label: "request", kind: "" },
   { at: 1, left: 18, label: "readFile()", kind: "call" },
-  { at: 3, left: 38, label: "tâche A", kind: "" },
-  { at: 5, left: 58, label: "tâche B", kind: "" },
+  { at: 3, left: 38, label: "task A", kind: "" },
+  { at: 5, left: 58, label: "task B", kind: "" },
   { at: 8, left: 80, label: "callback", kind: "callback" },
 ];
 
@@ -266,12 +266,12 @@ function EventLoopLanes({ phase }: { phase: number }) {
     <div
       className={`lanes${phase === 0 ? " is-reset" : ""}`}
       role="img"
-      aria-label="Schéma animé : le thread principal continue pendant que libuv lit le fichier"
+      aria-label="Animated diagram: the main thread continues while libuv reads the file"
     >
-      <span className="visual-caption">DEUX VOIES, ZÉRO ATTENTE</span>
+      <span className="visual-caption">TWO PATHS, ZERO WAITING</span>
 
       <div className="lane">
-        <span className="lane-label">THREAD PRINCIPAL · JAVASCRIPT</span>
+        <span className="lane-label">MAIN THREAD · JAVASCRIPT</span>
         <div className="lane-track">
           {laneBlocks.map((block) => (
             <span
@@ -286,11 +286,11 @@ function EventLoopLanes({ phase }: { phase: number }) {
       </div>
 
       <div className="lane">
-        <span className="lane-label">ARRIÈRE-PLAN · LIBUV</span>
+        <span className="lane-label">BACKGROUND · LIBUV</span>
         <div className="lane-track">
           <div className="io-bar" style={{ left: "18%", width: "62%" }}>
             <span className="io-fill" style={{ transform: `scaleX(${progress})` }} />
-            <span className="io-text">lecture du fichier…</span>
+            <span className="io-text">reading file…</span>
           </div>
         </div>
       </div>
@@ -311,17 +311,17 @@ function FunctioningSlide({ isActive }: { isActive: boolean }) {
     <div className="slide-inner flow-layout">
       <div className="flow-intro">
         <div>
-          <Eyebrow number="03">FONCTIONNEMENT</Eyebrow>
-          <h2 className="slide-title">Un seul fil.<br /><span>Sans attendre les E/S.</span></h2>
+          <Eyebrow number="03">HOW IT WORKS</Eyebrow>
+          <h2 className="slide-title">One thread.<br /><span>Without waiting on I/O.</span></h2>
         </div>
         <p className="slide-lead">
-          La <strong>boucle d'événements</strong>, fournie par libuv, orchestre le travail.
-          Les entrées/sorties sont prises en charge en arrière-plan ; Node.js
-          récupère leur résultat dès qu'il est disponible.
+          The <strong>event loop</strong>, provided by libuv, orchestrates the work.
+          Input/output operations are handled in the background; Node.js receives
+          their results as soon as they are available.
         </p>
       </div>
 
-      <div className="flow-timeline" aria-label="Les quatre étapes d'une opération asynchrone">
+      <div className="flow-timeline" aria-label="The four steps of an asynchronous operation">
         <span
           className="flow-traveler"
           aria-hidden="true"
@@ -352,8 +352,8 @@ function FunctioningSlide({ isActive }: { isActive: boolean }) {
       <div className="flow-bottom">
         <p className="flow-footnote">
           <span className="footnote-line" />
-          Le code JavaScript s'exécute sur un seul thread : il faut éviter
-          les calculs longs qui bloquent cette boucle.
+          JavaScript runs on a single thread: avoid long computations
+          that block this loop.
         </p>
         <EventLoopLanes phase={phase} />
       </div>
@@ -362,10 +362,10 @@ function FunctioningSlide({ isActive }: { isActive: boolean }) {
 }
 
 const features = [
-  { number: "01", icon: Globe, motion: "pulse", title: "HTTP & APIs", detail: "Recevoir des requêtes et renvoyer des données, souvent en JSON." },
-  { number: "02", icon: RefreshCw, motion: "spin", title: "E/S asynchrones", detail: "Lire un fichier ou appeler un service sans figer le serveur." },
-  { number: "03", icon: Boxes, motion: "float", title: "Modules natifs", detail: "Accéder aux fichiers, au réseau, aux flux et aux processus." },
-  { number: "04", icon: Package, motion: "bob", title: "Écosystème npm", detail: "Installer des bibliothèques et automatiser le projet." },
+  { number: "01", icon: Globe, motion: "pulse", title: "HTTP & APIs", detail: "Receive requests and return data, often as JSON." },
+  { number: "02", icon: RefreshCw, motion: "spin", title: "Asynchronous I/O", detail: "Read a file or call a service without freezing the server." },
+  { number: "03", icon: Boxes, motion: "float", title: "Built-in modules", detail: "Access files, networking, streams, and processes." },
+  { number: "04", icon: Package, motion: "bob", title: "npm ecosystem", detail: "Install libraries and automate the project." },
 ];
 
 function FeaturesSlide() {
@@ -373,12 +373,12 @@ function FeaturesSlide() {
     <div className="slide-inner features-layout">
       <div className="features-heading">
         <div>
-          <Eyebrow number="04">FONCTIONNALITÉS</Eyebrow>
-          <h2 className="slide-title">Les bonnes briques,<br /><span>au bon endroit.</span></h2>
+          <Eyebrow number="04">FEATURES</Eyebrow>
+          <h2 className="slide-title">The right building blocks,<br /><span>in the right place.</span></h2>
         </div>
         <p className="slide-lead">
-          Des outils intégrés et un vaste écosystème pour construire des
-          applications côté serveur.
+          Built-in tools and a vast ecosystem for building
+          server-side applications.
         </p>
       </div>
       <div className="features-grid">
@@ -408,21 +408,21 @@ function RoleSlide() {
     <div className="slide-inner role-layout">
       <div className="role-heading">
         <div>
-          <Eyebrow number="05">DANS L'APPLICATION</Eyebrow>
-          <h2 className="slide-title">Entre l'interface<br /><span>et la donnée.</span></h2>
+          <Eyebrow number="05">IN THE APPLICATION</Eyebrow>
+          <h2 className="slide-title">Between the interface<br /><span>and the data.</span></h2>
         </div>
         <p className="slide-lead">
-          Dans une application avec un backend Node.js, il reçoit les requêtes,
-          applique la logique métier et échange avec les données.
+          In an application with a Node.js backend, it receives requests,
+          applies business logic, and communicates with data sources.
         </p>
       </div>
 
-      <div className="architecture" aria-label="Interface utilisateur vers serveur Node.js vers données">
+      <div className="architecture" aria-label="User interface to Node.js server to data">
         <div className="architecture-part">
           <Monitor className="architecture-icon" size={39} strokeWidth={1.2} aria-hidden="true" />
-          <span className="architecture-label">01 / CÔTÉ CLIENT</span>
+          <span className="architecture-label">01 / CLIENT SIDE</span>
           <h3>Interface</h3>
-          <p>Affiche et envoie les actions de l'utilisateur.</p>
+          <p>Displays and sends user actions.</p>
         </div>
         <div className="architecture-link" aria-hidden="true">
           <small className="link-label">HTTP · JSON</small>
@@ -434,27 +434,27 @@ function RoleSlide() {
             <span className="node-orbit" />
             <NodeMark className="architecture-icon architecture-mark" />
           </div>
-          <span className="architecture-label">02 / CÔTÉ SERVEUR</span>
+          <span className="architecture-label">02 / SERVER SIDE</span>
           <h3>Node.js</h3>
-          <p>Expose l'API, exécute la logique et sécurise les échanges.</p>
-          <span className="loop-chip"><RefreshCw size={12} strokeWidth={2} aria-hidden="true" /> boucle d'événements</span>
+          <p>Exposes the API, runs the logic, and secures communication.</p>
+          <span className="loop-chip"><RefreshCw size={12} strokeWidth={2} aria-hidden="true" /> event loop</span>
         </div>
         <div className="architecture-link" aria-hidden="true">
-          <small className="link-label">REQUÊTES</small>
+          <small className="link-label">REQUESTS</small>
           <span />
           <span className="back" />
         </div>
         <div className="architecture-part">
           <Database className="architecture-icon" size={39} strokeWidth={1.2} aria-hidden="true" />
-          <span className="architecture-label">03 / STOCKAGE</span>
-          <h3>Données</h3>
-          <p>Base de données et services externes.</p>
+          <span className="architecture-label">03 / STORAGE</span>
+          <h3>Data</h3>
+          <p>Database and external services.</p>
         </div>
       </div>
 
       <div className="development-note">
         <span className="development-plus">+</span>
-        <p><strong>Pendant le développement,</strong> Node.js exécute aussi npm, Vite et les scripts de build.</p>
+        <p><strong>During development,</strong> Node.js also runs npm, Vite, and build scripts.</p>
       </div>
     </div>
   );
@@ -511,12 +511,12 @@ function CodeSlide({ isActive }: { isActive: boolean }) {
     <div className="slide-inner code-layout">
       <div className="code-heading">
         <div>
-          <Eyebrow number="06">EN PRATIQUE</Eyebrow>
-          <h2 className="slide-title">Un serveur.<br /><span>Quelques lignes.</span></h2>
+          <Eyebrow number="06">IN PRACTICE</Eyebrow>
+          <h2 className="slide-title">A server.<br /><span>Just a few lines.</span></h2>
         </div>
         <p className="slide-lead">
-          Le module natif <code>node:http</code> suffit pour écouter une requête
-          et répondre en JSON — sans rien installer.
+          The built-in <code>node:http</code> module is enough to listen for a request
+          and respond with JSON — no installation required.
         </p>
       </div>
 
@@ -524,13 +524,13 @@ function CodeSlide({ isActive }: { isActive: boolean }) {
         <div className="code-editor">
           <div className="code-editor-bar">
             <div className="window-dots" aria-hidden="true"><span /><span /><span /></div>
-            <span className="filename">serveur.mjs</span>
-            <button className="copy-button" onClick={copyCode} aria-label={copied ? "Code copié" : "Copier le code"}>
+            <span className="filename">server.mjs</span>
+            <button className="copy-button" onClick={copyCode} aria-label={copied ? "Code copied" : "Copy code"}>
               {copied ? <Check size={15} /> : <Copy size={15} />}
-              <span>{copied ? "Copié" : "Copier"}</span>
+              <span>{copied ? "Copied" : "Copy"}</span>
             </button>
           </div>
-          <pre aria-label="Exemple de serveur HTTP en Node.js"><code>
+          <pre aria-label="Node.js HTTP server example"><code>
             {serverCode.split("\n").map((line, index) => (
               <span
                 className={`code-line${hot.includes(index) ? " is-hot" : ""}`}
@@ -545,17 +545,17 @@ function CodeSlide({ isActive }: { isActive: boolean }) {
         </div>
 
         <div className="code-output">
-          <span className="visual-caption">CE QUI SE PASSE</span>
+          <span className="visual-caption">WHAT HAPPENS</span>
           <span className={`run-command${phase === 0 ? " is-hot" : ""}`}>
-            <i className="live-dot" aria-hidden="true" /> $ node serveur.mjs
+            <i className="live-dot" aria-hidden="true" /> $ node server.mjs
           </span>
           <div className={`request-line step-item${phase >= 1 ? " on" : ""}`}><span>GET</span> localhost:3000</div>
           <span className={`output-connector${phase >= 2 ? " on" : ""}`} aria-hidden="true" />
           <div className={`response-block step-item${phase >= 4 ? " on" : ""}`}>
             <span className="status-badge">200 OK</span>
-            <div className="response-line">{'{ "message": "Bonjour !" }'}</div>
+            <div className="response-line">{'{ "message": "Hello!" }'}</div>
           </div>
-          <p>Node.js écoute sur le port 3000 et renvoie une réponse JSON.</p>
+          <p>Node.js listens on port 3000 and returns a JSON response.</p>
         </div>
       </div>
     </div>
@@ -563,20 +563,20 @@ function CodeSlide({ isActive }: { isActive: boolean }) {
 }
 
 const takeaways = [
-  { number: "01", text: "JavaScript s'exécute aussi hors du navigateur." },
-  { number: "02", text: "L'asynchrone aide à gérer les entrées/sorties." },
-  { number: "03", text: "Node.js sert aux APIs, aux scripts et aux outils." },
+  { number: "01", text: "JavaScript also runs outside the browser." },
+  { number: "02", text: "Asynchronous operations help handle input/output." },
+  { number: "03", text: "Node.js powers APIs, scripts, and tools." },
 ];
 
 function SummarySlide({ onRestart }: { onRestart: () => void }) {
   return (
     <div className="slide-inner summary-layout">
       <div className="summary-heading">
-        <Eyebrow number="07">SYNTHÈSE</Eyebrow>
-        <h2 className="slide-title">Node.js,<br /><span>en trois idées.</span></h2>
-        <p className="slide-lead">Un même langage, du navigateur jusqu'aux outils et au serveur.</p>
+        <Eyebrow number="07">SUMMARY</Eyebrow>
+        <h2 className="slide-title">Node.js,<br /><span>in three ideas.</span></h2>
+        <p className="slide-lead">One language, from the browser to tools and the server.</p>
         <button className="primary-button restart-button" onClick={onRestart}>
-          Revoir la présentation <ArrowRight size={19} strokeWidth={1.8} />
+          Review the presentation <ArrowRight size={19} strokeWidth={1.8} />
         </button>
       </div>
       <div className="summary-right">
@@ -589,12 +589,12 @@ function SummarySlide({ onRestart }: { onRestart: () => void }) {
           ))}
         </div>
         <div className="source-links">
-          <span>POUR ALLER PLUS LOIN</span>
+          <span>LEARN MORE</span>
           <a href="https://nodejs.org/en/about" target="_blank" rel="noopener noreferrer" style={stagger(0)}>
-            À propos de Node.js <ArrowUpRight size={15} />
+            About Node.js <ArrowUpRight size={15} />
           </a>
           <a href="https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick" target="_blank" rel="noopener noreferrer" style={stagger(1)}>
-            La boucle d'événements <ArrowUpRight size={15} />
+            The event loop <ArrowUpRight size={15} />
           </a>
         </div>
       </div>
@@ -714,20 +714,20 @@ export default function App() {
   return (
     <main className="app-shell">
       <header className="topbar">
-        <button className="brand-lockup" onClick={() => goTo(0)} aria-label="Retour à la première diapositive">
+        <button className="brand-lockup" onClick={() => goTo(0)} aria-label="Return to the first slide">
           <NodeMark className="brand-mark" />
-          <span className="brand-words"><strong>NODE.JS</strong><small>PRÉSENTATION</small></span>
+          <span className="brand-words"><strong>NODE.JS</strong><small>PRESENTATION</small></span>
         </button>
-        <div className="topbar-center">DÉVELOPPEMENT WEB <span>/</span> GUIDE EXPRESS</div>
+        <div className="topbar-center">WEB DEVELOPMENT <span>/</span> QUICK GUIDE</div>
         <div className="topbar-actions">
           <button className="overview-trigger" onClick={() => setOverviewOpen(true)} aria-label="Ouvrir le sommaire">
-            <Grid2X2 size={17} strokeWidth={1.7} /> <span>Sommaire</span>
+            <Grid2X2 size={17} strokeWidth={1.7} /> <span>Overview</span>
           </button>
           <span className="action-divider" aria-hidden="true" />
-          <button className="icon-button print-button" onClick={() => window.print()} title="Imprimer ou exporter en PDF" aria-label="Imprimer ou exporter en PDF">
+          <button className="icon-button print-button" onClick={() => window.print()} title="Print or export as PDF" aria-label="Print or export as PDF">
             <Printer size={18} strokeWidth={1.7} />
           </button>
-          <button className="icon-button fullscreen-button" onClick={toggleFullscreen} title={isFullscreen ? "Quitter le plein écran" : "Afficher en plein écran"} aria-label={isFullscreen ? "Quitter le plein écran" : "Afficher en plein écran"}>
+          <button className="icon-button fullscreen-button" onClick={toggleFullscreen} title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"} aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}>
             {isFullscreen ? <Minimize2 size={18} strokeWidth={1.7} /> : <Maximize2 size={18} strokeWidth={1.7} />}
           </button>
         </div>
@@ -750,16 +750,16 @@ export default function App() {
       </div>
 
       <footer className="deck-footer">
-        <div className="keyboard-hint"><span className="keycap">←</span><span className="keycap">→</span> Naviguer avec les flèches</div>
+        <div className="keyboard-hint"><span className="keycap">←</span><span className="keycap">→</span> Navigate with the arrow keys</div>
         <div className="deck-progress">
           <span className="current-number">{slides[active].number}</span>
-          <div className="progress-segments" role="group" aria-label="Aller à une diapositive">
+          <div className="progress-segments" role="group" aria-label="Go to a slide">
             {slides.map((slide, index) => (
               <button
                 key={slide.number}
                 className={`progress-segment${index <= active ? " reached" : ""}${index === active ? " current" : ""}`}
                 onClick={() => goTo(index)}
-                aria-label={`Diapositive ${slide.number} : ${slide.title}`}
+                aria-label={`Slide ${slide.number}: ${slide.title}`}
                 aria-current={index === active ? "step" : undefined}
               ><span /></button>
             ))}
@@ -767,10 +767,10 @@ export default function App() {
           <span className="total-number">{String(slides.length).padStart(2, "0")}</span>
         </div>
         <div className="footer-controls">
-          <button className="nav-arrow prev-arrow" onClick={() => goTo(active - 1)} disabled={active === 0} aria-label="Diapositive précédente">
+          <button className="nav-arrow prev-arrow" onClick={() => goTo(active - 1)} disabled={active === 0} aria-label="Previous slide">
             <ArrowLeft size={20} strokeWidth={1.8} />
           </button>
-          <button className="nav-arrow next-arrow" onClick={() => goTo(active + 1)} disabled={active === slides.length - 1} aria-label="Diapositive suivante">
+          <button className="nav-arrow next-arrow" onClick={() => goTo(active + 1)} disabled={active === slides.length - 1} aria-label="Next slide">
             <ArrowRight size={20} strokeWidth={1.8} />
           </button>
         </div>
@@ -782,10 +782,10 @@ export default function App() {
         }}>
           <aside className="overview-panel" role="dialog" aria-modal="true" aria-labelledby="overview-title">
             <div className="overview-header">
-              <div><span className="overview-kicker">NAVIGATION</span><h2 id="overview-title">Sommaire<span>.</span></h2></div>
+              <div><span className="overview-kicker">NAVIGATION</span><h2 id="overview-title">Overview<span>.</span></h2></div>
               <button className="overview-close" ref={closeOverviewRef} onClick={() => setOverviewOpen(false)} aria-label="Fermer le sommaire"><X size={22} /></button>
             </div>
-            <nav className="overview-list" aria-label="Diapositives">
+            <nav className="overview-list" aria-label="Slides">
               {slides.map((slide, index) => (
                 <button className={`overview-item${active === index ? " selected" : ""}`} key={slide.number} onClick={() => goTo(index)}>
                   <span className="overview-number">{slide.number}</span>
